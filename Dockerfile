@@ -1,8 +1,10 @@
 # Use Python 3.10
 FROM python:3.10-slim
 # Install system packages needed by OpenCV
-RUN apt-get update && apt-get install -y libgl1
-
+# RUN apt-get update && apt-get install -y libgl1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 libglib2.0-0 libsm6 libxext6 libxrender1 ffmpeg \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 # Set working directory
 WORKDIR /app
 
