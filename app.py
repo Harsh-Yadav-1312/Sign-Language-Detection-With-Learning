@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 import time
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
@@ -71,8 +73,5 @@ def learn_a_f():
     return render_template('A-F.html')
 
 if __name__ == '__main__':
-    import os
-    import eventlet
-    eventlet.monkey_patch()
     port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host='0.0.0.0', port=port, server='eventlet')
+    socketio.run(app, host='0.0.0.0', port=port)
