@@ -29,7 +29,7 @@ h11==0.14.0
 h5py
 idna==3.4
 itsdangerous==2.2.0
-jax==0.4.13
+jax
 
 # ↓ Removed version to allow numpy compatibility
 jaxlib
