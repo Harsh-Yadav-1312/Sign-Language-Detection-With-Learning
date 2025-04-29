@@ -83,7 +83,8 @@ sentencepiece==0.2.0
 simple-websocket==1.1.0
 six==1.16.0
 sounddevice==0.5.1
-tensorboard==2.19.0
+tensorboard==2.13.0
+
 tensorboard-data-server==0.7.2
 tensorflow-io-gcs-filesystem==0.31.0
 tensorflow==2.13.0
