@@ -49,7 +49,7 @@ opt_einsum==3.4.0
 optree==0.14.0
 packaging==24.2
 pillow==11.1.0
-mediapipe==0.10.0
+mediapipe==0.10.5
 protobuf==4.23.4
 pycparser==2.22
 pydot==3.0.4
