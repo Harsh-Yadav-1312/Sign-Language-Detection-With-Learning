@@ -463,7 +463,31 @@ body{
 .block{
     width: 100%;
     scroll-snap-align: start none;
+    /* scroll-snap-align: start; */
 }
+
+
+.black-button-big {
+    background-color: black;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
+    transition: 0.3s ease;
+    display: inline-block;
+}
+
+.black-button-big:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+}
+
+
+
+
+
 
 
 .block-1{

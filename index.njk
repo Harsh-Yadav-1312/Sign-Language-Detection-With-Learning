@@ -1,0 +1,50 @@
+---
+title: 'SignLanguage: Learn Sign language practically'
+layout: 'layouts/base.njk'
+---
+
+{% include 'partials/_header.html' %}
+
+<section class="max-w-7xl mx-auto px-4 " >
+    <h1 class="py-6 rubik text-4xl font-bold" >Learn American Sign Language Practically.</h1>
+    {# cards #}
+    <div class="flex flex-wrap gap-4 ">
+        {# import card from component folder #}
+        {% import 'components/cards.njk' as macro  %}
+        {{ macro.card('bg-[#E8B6D2]','/app/phrases/index.html','Phrases Dictionary','English-American Sign Language dictionary contains video for over 100,000 words.','/assets/img/youtube.png') }}
+        {{ macro.card('bg-[#FFC72E]','/app/alphabetSong/index.html','Alphabet Songs','Learn alphabets through songs from Jack Hartmann Kids Music Channel ','/assets/img/peace.png' ) }}
+    </div>
+
+    <h1 class="py-6 rubik text-4xl font-bold" >ASL Basic Curriculum</h1>
+    {# cards #}
+    <div class="flex flex-wrap gap-4 mb-8">
+        {# import card from component folder #}
+        {% import 'components/cards.njk' as macro  %}
+        {# {{ macro.card('bg-[#E8B6D2]','/app/phrases/index.html','Learn Phrases','English-American Sign Language dictionary contains video for over 100,000 words.','/assets/img/youtube.png') }} #}
+        {{ macro.card('bg-[#A0A6FF]','/app/playNumbers/index.html','Learn Numbers','Learn numbers from 0-10 in  chronological order with the help of artificial intelligence.','/assets/img/hell-yeah.png') }}
+
+      
+
+        {{ macro.card('bg-[#72CAC3]','C:\safepurpose\sign-language-detection\templates\A-F.html','Learn Alphabets A-F','Learn alphabets from A-F in  chronological order with the help of artificial intelligence.','/assets/img/ABC.png') }}
+
+        {{ macro.card('bg-[#72CAC3]','/app/alphabetQuiz-A-F/index.html','Alphabets Quiz A-F','Learn alphabets from A-F in random order with the help of artificial intelligence quiz.','/assets/img/ABC.png') }}
+
+        {{ macro.card('bg-[#F9DBBB]','C:\safepurpose\sign-language-detection\templates\G-K.html','Learn Alphabets G-K','Learn alphabets from G-K in  chronological order with the help of artificial intelligence.','/assets/img/GHI.png') }}
+
+        {{ macro.card('bg-[#F9DBBB]','/app/alphabetQuiz-G-K/index.html','Alphabets Quiz G-K','Learn alphabets from G-K in  random order with the help of artificial intelligence.','/assets/img/GHI.png') }}
+
+        {{ macro.card('bg-[#FDD36A]','C:\safepurpose\sign-language-detection\templates\L-P.html','Learn Alphabets L-P','Learn alphabets from L-P in  chronological order with the help of artificial intelligence.','/assets/img/LMN.png') }}
+
+        {{ macro.card('bg-[#FDD36A]','/app/alphabetQuiz-L-P/index.html','Alphabets Quiz L-P','Learn alphabets from L-P in  random order with the help of artificial intelligence.','/assets/img/LMN.png') }}
+
+        {{ macro.card('bg-[#9DC08B]','C:\safepurpose\sign-language-detection\templates\Q-U.html','Learn Alphabets Q-U','Learn alphabets from Q-U in  chronological order with the help of artificial intelligence.','/assets/img/QRS.png') }}
+
+        {{ macro.card('bg-[#9DC08B]','/app/alphabetQuiz-Q-U/index.html','Alphabets Quiz Q-U','Learn alphabets from Q-U in  random order with the help of artificial intelligence.','/assets/img/QRS.png') }}
+
+        {{ macro.card('bg-[#F7C8E0]','C:\safepurpose\sign-language-detection\templates\V-Z.html','Learn Alphabets V-Z','Learn alphabets from V-Z in  chronological order with the help of artificial intelligence.','/assets/img/VWX.png') }}
+
+        {{ macro.card('bg-[#F7C8E0]','/app/alphabetQuiz-V-Z/index.html','Alphabets Quiz V-Z','Learn alphabets from V-Z in  random order with the help of artificial intelligence.','/assets/img/VWX.png') }}
+        
+    </div>
+
+</section>

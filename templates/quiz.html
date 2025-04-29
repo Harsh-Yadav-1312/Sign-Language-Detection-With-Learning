@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@mojs/core"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='components/quiz.css') }}">
+    <script src="{{ url_for('static', filename='components/quiz.js') }}" defer></script>
+    <title>Sign Language Quiz</title>
+    
+</head>
+<body>
+    
+    <div class="quiz-container">
+        <h1 class="quiz-heading">🤔 Guess the Sign!</h1>
+        <div id="score">Score: 0</div>
+        <img id="symbolImage" class="symbol-image" src="" alt="Sign Language Symbol">
+        <div class="options" id="optionsContainer"></div>
+        <button id="skipButton" class="skip-btn">Skip Question</button>
+    </div>
+
+  
+
+
+<div id="toast" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+background: white; padding: 10px 20px; border-left: 5px solid #8a4fff;
+box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 6px;
+display: none; transition: opacity 0.3s ease; z-index: 10000;">
+</div>
+
+<div id="congratsMessage" style="
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: bold;
+    background: white;
+    padding: 20px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 10001;
+    color: #6a00f4;
+    animation: popIn 0.5s ease;
+"></div>
+
+<!-- mo.js Container -->
+<div id="mojs-container" style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9999;
+"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mojs/core"></script>
+
+
+
+
+<!-- History Button -->
+<button id="historyButton" class="skip-btn" style="position: fixed; top: 20px; right: 20px;">View History</button>
+
+<!-- History Modal -->
+<div id="historyModal" style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+">
+    <div style="
+        background: white;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        position: relative;
+    ">
+        <h2 style="text-align:center; margin-bottom: 15px;">📝 Answer History</h2>
+        <div id="historyContent"></div>
+        <button onclick="closeHistory()" style="
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        ">&times;</button>
+    </div>
+</div>
+
+</body>
+</html>

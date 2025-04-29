@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Gesture Recognition Learning</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.5.1675469404/hands.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.10.0/dist/tf-converter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.8/dist/tf-tflite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        
+        .logo {
+    margin-top: -2px;
+    transform: scale(1);
+    padding: 5px;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.618);
+    border-radius: 10px;
+    transition: 0.3s;
+    background-color: rgba(255, 255, 255, 0); /* optional for contrast */
+}
+
+.logo:hover {
+    box-shadow: 4px 4px 0px 1px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(0, 0, 0, 0.618);
+}
+
+.logo:active {
+    box-shadow: 2px 2px 0px 1px rgba(0, 0, 0, 0.5), 0px 0px 0px 1px rgba(0, 0, 0, 0.618);
+}
+
+/* Fixed top-left positioning */
+.fixed-logo {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .video-section {
+            flex: 3;
+            background-color: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .learning-section {
+            flex: 1;
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .letter-display {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .current-letter {
+            font-size: 72px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .letter-icon {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .instruction {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #444;
+            height: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .confidence-display {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .status {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .letter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .nav-button {
+            background-color: #555;
+            padding: 8px 15px;
+        }
+
+        .nav-button:hover {
+            background-color: #666;
+        }
+
+        .mode-toggle {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .mode-button {
+            background-color: #9c27b0;
+        }
+
+        .mode-button:hover {
+            background-color: #7b1fa2;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .feedback.good {
+            background-color: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+
+        .feedback.trying {
+            background-color: rgba(255, 193, 7, 0.3);
+            color: #FFC107;
+        }
+
+        .feedback.wrong {
+            background-color: rgba(244, 67, 54, 0.3);
+            color: #F44336;
+        }
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            opacity: 0.8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        .instruction-box {
+    color: #ccc;
+    font-size: 24px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    margin: 20px 0;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+
+.happy-learning {
+    display: block;
+    margin-top: 8px;
+    font-weight: bold;
+    color: #ffccff;
+    font-size: 30px;
+    animation: bounce 1.2s infinite ease-in-out;
+}
+
+
+
+
+
+.container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  .video-section {
+    flex: 2;
+    position: relative;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .learning-section {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #1a1a1a;
+  }
+
+  canvas, video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* Responsive for mobile */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+
+    .video-section {
+      width: 100%;
+      height: 50vh;
+    }
+
+    .learning-section {
+      width: 100%;
+      height: 50vh;
+      overflow-y: auto;
+    }
+  }
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+        @keyframes popFade {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    <a href="{{ url_for('landing') }}">
+        <img src="{{ url_for('static', filename='sign-logo2.png') }}" alt="Logo" width="55" height="55" class="logo fixed-logo">
+    </a>
+    <div class="container">
+        
+        <div class="video-section">
+            
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="countdown hidden" id="countdown">3</div>
+            <div id="celebration" style="
+            position: absolute;
+            top: 50%;
+            left: 55%;
+            transform: translate(-55%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: gold;
+            display: none;
+            z-index: 999;
+            text-shadow: 2px 2px 10px black;
+            pointer-events: none;
+            animation: popFade 4s ease-out forwards;
+        ">
+            🎉 Good Job! 🎉
+        </div>
+        </div>
+
+        <div class="learning-section">
+            <div class="letter-display">
+                <h3>Show This Letter</h3>
+                <div class="current-letter" id="targetLetter">F</div>
+                <img id="letterIcon" class="letter-icon" src="/static/symbols/F.jpg" alt="Letter F hand sign">
+
+            </div>
+
+            <div class="instruction" id="instruction">Form the letter with your hand</div>
+
+            <div class="confidence-display" id="confidenceDisplay">Confidence: 0%</div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="feedback hidden" id="feedback"></div>
+
+            <div class="letter-navigation">
+                <button class="nav-button" id="prevBtn">Previous</button>
+                <button class="nav-button" id="nextBtn">Next</button>
+            </div>
+            <div id="instructionBox" class="instruction-box">
+                👉 Hold your hand inside the white box shown in the camera module.<br>
+                ✋ Make sure your hand sign matches the image above.<br>
+                🕒 Hold steady until the progress bar completes and it automatically moves to the next letter.
+                <div class="happy-learning">🌟 Happy Learning! 🌈</div>
+            </div>
+            <div class="controls">
+                <button id="startBtn">Start Camera</button>
+                <button id="toggleModeBtn" class="mode-button">Switch to Practice Mode</button>
+            </div>
+
+            <div class="status" id="status">Status: Ready</div>
+        </div>
+    </div>
+
+
+   
+    <script>
+
+        const socket = io();
+        const CLASS_NAMES = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+        const LETTER_ICONS = Object.fromEntries(CLASS_NAMES.map(l => [l, `/static/symbols/${l}.jpg`]));
+        const CONFIDENCE_THRESHOLD = 0.5;
+        const SUCCESS_HOLD_TIME = 2000;
+        const CAPTURE_INTERVAL = 100;
+
+        let video, canvas, ctx, captureInterval;
+        let currentLetterIndex = 5;
+        let isLearningMode = true;
+        let successStartTime = 0;
+        let isCapturing = false;
+        let letterProgress = Object.fromEntries(CLASS_NAMES.map(l => [l, 0]));
+
+        const startBtn = document.getElementById('startBtn');
+        const toggleModeBtn = document.getElementById('toggleModeBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const status = document.getElementById('status');
+        const targetLetterEl = document.getElementById('targetLetter');
+        const letterIconEl = document.getElementById('letterIcon');
+        const confidenceDisplayEl = document.getElementById('confidenceDisplay');
+        const progressBarEl = document.getElementById('progressBar');
+        const feedbackEl = document.getElementById('feedback');
+
+        prevBtn.addEventListener('click', previousLetter);
+        nextBtn.addEventListener('click', nextLetter);
+        toggleModeBtn.addEventListener('click', toggleMode);
+        startBtn.addEventListener('click', startCamera);
+
+
+
+
+
+        
+
+        async function initializeApp() {
+            video = document.getElementById('video');
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+
+            updateLetterDisplay();
+            startBtn.disabled = false;
+            toggleModeBtn.disabled = false;
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480, facingMode: 'user' }
+                });
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    startBtn.disabled = true;
+                    status.textContent = "Status: Camera started";
+                    startCapture();
+                };
+            } catch (e) {
+                status.textContent = `Status: Error starting camera - ${e.message}`;
+            }
+        }
+
+        function startCapture() {
+    isCapturing = true;
+
+    const boxX = 160;
+    const boxY = 80;
+    const boxWidth = 320;
+    const boxHeight = 320;
+
+    captureInterval = setInterval(() => {
+        if (!isCapturing) return;
+
+        // Draw video frame
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // ✅ Draw the guide box (after video so it stays visible)
+        ctx.strokeStyle = "#ffffff";  // white color
+ctx.lineWidth = 1;          // thinner border
+ctx.strokeRect(160, 80, 320, 320);
+
+        // ✅ Crop the image for backend prediction
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = boxWidth;
+        tempCanvas.height = boxHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(video, boxX, boxY, boxWidth, boxHeight, 0, 0, boxWidth, boxHeight);
+
+        const croppedDataURL = tempCanvas.toDataURL('image/jpeg');
+        const base64CroppedImage = croppedDataURL.split(',')[1];
+
+        // Send to backend
+        socket.emit('image', base64CroppedImage);
+
+    }, CAPTURE_INTERVAL);
+}
+
+
+        let detectionBuffer = 0;
+const REQUIRED_DETECTIONS = 3; // number of correct frames before accepting
+
+socket.on('processed_frame', data => {
+    const { frame, letter, prediction_score } = data;
+    const confidence = parseFloat(prediction_score);
+    const target = CLASS_NAMES[currentLetterIndex];
+
+    confidenceDisplayEl.textContent = `Confidence: ${(confidence * 100).toFixed(2)}%`;
+
+    // ✅ Redraw the video frame
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // ✅ Redraw the green guide box
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(160, 80, 320, 320);
+
+    // ✅ Draw prediction text
+    // ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    // ctx.fillRect(10, 10, 160, 40);
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#ffffff";  
+    ctx.fillText(`Predicted: ${letter}`, 18, 28);
+    ctx.fillText(`${(confidence * 100).toFixed(1)}%`, 18, 45);
+
+    // Buffer logic
+    if (confidence > CONFIDENCE_THRESHOLD && letter === target) {
+        detectionBuffer++;
+        const progress = Math.min((detectionBuffer / REQUIRED_DETECTIONS) * 100, 100);
+        progressBarEl.style.width = `${progress}%`;
+
+        if (detectionBuffer >= REQUIRED_DETECTIONS) {
+            feedbackEl.textContent = "Great job!";
+            feedbackEl.className = "feedback good";
+            letterProgress[letter] = 100;
+
+ // 🎉 Show animation
+ const celebrationEl = document.getElementById('celebration');
+    celebrationEl.style.display = 'block';
+    celebrationEl.style.animation = 'popFade 4s ease-out forwards';
+
+    // 🧹 Hide it after animation
+    setTimeout(() => {
+        celebrationEl.style.display = 'none';
+    }, 2000);
+
+
+
+             // 🎉 Confetti animation
+    confetti({
+        particleCount: 3000,
+        spread: 5000,
+      colors: ['#bb0000', '#ffffff', '#00bb00', '#0000bb', '#ffbb00'],
+        origin: { y: 0.4,x:0.4 }
+    });
+            detectionBuffer = 0; // Reset buffer
+            nextLetter();
+        } else {
+            feedbackEl.textContent = "Hold it steady...";
+            feedbackEl.className = "feedback trying";
+        }
+    } else {
+        detectionBuffer = 0;
+        progressBarEl.style.width = `0%`;
+        feedbackEl.textContent = "Try again!";
+        feedbackEl.className = "feedback wrong";
+    }
+});
+
+function updateLetterDisplay() {
+    let letter;
+    if (isLearningMode) {
+        letter = CLASS_NAMES[currentLetterIndex];
+    } else {
+        // Random letter for practice mode
+        const randomIndex = Math.floor(Math.random() * CLASS_NAMES.length);
+        currentLetterIndex = randomIndex;
+        letter = CLASS_NAMES[randomIndex];
+    }
+
+    targetLetterEl.textContent = letter;
+    letterIconEl.src = LETTER_ICONS[letter];
+    progressBarEl.style.width = `${letterProgress[letter]}%`;
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback hidden";
+}
+        function previousLetter() {
+            currentLetterIndex = (currentLetterIndex - 1 + CLASS_NAMES.length) % CLASS_NAMES.length;
+            updateLetterDisplay();
+        }
+
+        function nextLetter() {
+            currentLetterIndex = (currentLetterIndex + 1) % CLASS_NAMES.length;
+            updateLetterDisplay();
+        }
+
+
+
+        function toggleMode() {
+    isLearningMode = !isLearningMode;
+    toggleModeBtn.textContent = isLearningMode ? "Switch to Practice Mode" : "Switch to Learning Mode";
+
+    const letterIcon = document.getElementById('letterIcon');
+    const instructionBox = document.getElementById('instructionBox');
+
+    if (isLearningMode) {
+        letterIcon.style.display = 'block';
+        instructionBox.innerHTML = `
+            👉 Hold your hand inside the white box shown in the camera module.<br>
+            ✋ Make sure your hand sign matches the image above.<br>
+            🕒 Hold steady until the progress bar completes and it automatically moves to the next letter.
+            <div class="happy-learning">🌟 Happy Learning! 🌈</div>
+        `;
+    } else {
+        letterIcon.style.display = 'none';
+        instructionBox.innerHTML = `
+            🎯 Practice Mode: Try to remember the hand sign for the given letter.<br>
+            😎 No visual clues here — trust your memory!
+            <div class="happy-learning">💪 Good Luck! ✨</div>
+        `;
+    }
+
+    detectionBuffer = 0;
+    progressBarEl.style.width = `0%`;
+    feedbackEl.textContent = "";
+    feedbackEl.className = "feedback hidden";
+
+    updateLetterDisplay();
+}
+
+        initializeApp();
+    </script>

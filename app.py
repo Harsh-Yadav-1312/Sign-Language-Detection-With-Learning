@@ -58,8 +58,17 @@ def about():
 def landing():
     return render_template('landing.html')
 
+@app.route('/learn', methods=['POST', 'GET'])
+def learn():
+    return render_template('learn.html')
 
+@app.route('/quiz', methods=['POST', 'GET'])
+def quiz():
+    return render_template('quiz.html')
 
+@app.route('/learn/A-F')
+def learn_a_f():
+    return render_template('A-F.html')
 
 if __name__ == '__main__':
     socketio.run(app, port = '5000', debug=True)
