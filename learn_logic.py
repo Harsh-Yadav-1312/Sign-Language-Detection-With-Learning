@@ -19,7 +19,10 @@ CLASS_NAMES = [
 TARGET_SCORE = 0.92
 CONSECUTIVE_REQUIRED = 4
 
-
+if not os.path.exists(TFLITE_PATH):
+    raise FileNotFoundError(f"Model file not found at: {TFLITE_PATH}")
+else:
+    print("Model file found!")
 interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
 classify_lite = interpreter.get_signature_runner("serving_default")
 
