@@ -16,6 +16,7 @@ from webcam_detect import sign_detection
 
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
