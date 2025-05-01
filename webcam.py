@@ -21,10 +21,15 @@ TARGET_PREDICTION_SCORE: float = 0.92
 
 
 def load_model():
+    if not os.path.exists(TFLITE_PATH):
+        raise FileNotFoundError(f"Model file not found at: {TFLITE_PATH}")
+    else:
+        print("Model file found!")
+
     interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
-    # print(interpreter.get_signature_list())
     classify_lite = interpreter.get_signature_runner("serving_default")
     return classify_lite
+
 
 
 def get_image_array(image_data):
