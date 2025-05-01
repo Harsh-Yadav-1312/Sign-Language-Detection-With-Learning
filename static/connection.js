@@ -14,7 +14,7 @@ function RecordButton(){
 }
      
 
-var socket = io.connect('http://localhost:5000');
+var socket = io.connect('https://sign-language-detection-with-learning-xwaf.onrender.com');
 
 socket.on('connect', function(){
     console.log("Connected...!", socket.connected)
