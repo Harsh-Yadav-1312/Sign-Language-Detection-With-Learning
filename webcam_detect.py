@@ -99,7 +99,7 @@ def sign_detection(img):
         (255, 255, 255),
     )
     cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
-    cv2.imshow("Video Capture", img)
+   
 
    
     return img, predicted_char, str(prediction_score)
