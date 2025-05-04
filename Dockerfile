@@ -18,6 +18,7 @@ COPY . .
 # Set environment variables (optional)
 ENV PYTHONUNBUFFERED=1
 
+EXPOSE 5000
 # Default command (change if needed)
 CMD ["python", "app.py"]
 
