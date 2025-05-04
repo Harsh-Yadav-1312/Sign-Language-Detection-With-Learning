@@ -111,15 +111,28 @@ setTimeout(processVideo, 0);
 
 
 //Send frame to Server
-var a = setInterval(() => {
-    if(!record){
+let lastSentTime = 0;
+const throttleMs = 300; // one prediction every 300ms (3–4 FPS max)
+
+function sendFrameIfDue() {
+    if (record) return; // Don't send if recording
+
+    const now = Date.now();
+    if (now - lastSentTime >= throttleMs) {
+        lastSentTime = now;
+
         cap.read(src);
-        var type = "image/png"
-        var data = document.getElementById("canvasOutput").toDataURL(type, 0.1);
-        data = data.replace('data:' + type + ';base64,', ''); //split off junk 
-        socket.emit('image', data);
+        const type = "image/png";
+        const data = document.getElementById("canvasOutput").toDataURL(type, 0.1);
+        const base64Data = data.replace('data:' + type + ';base64,', '');
+
+        socket.emit('image', base64Data);
     }
-}, 10000/FPS);
+
+    requestAnimationFrame(sendFrameIfDue); // smoother scheduling
+}
+
+requestAnimationFrame(sendFrameIfDue);
 
 //Consecutive Acceptance Rate - takes consecutive detection of same character as one. 
 var CAR = 5;
