@@ -76,4 +76,5 @@ def learn_a_f():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+      print("Starting server on port", port)  # ✅ Add here
     socketio.run(app, host='0.0.0.0', port=port)
