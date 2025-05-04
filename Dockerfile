@@ -20,6 +20,7 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 5000
 # Default command (change if needed)
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-k", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "app:app"]
+
 
 
